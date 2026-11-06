@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shan's Elite Residency - Visitor Management System</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Font: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              dark: '#17483e',
+              darker: '#0e2e28',
+              gold: '#f5c76b',
+              goldhover: '#e0b255',
+              light: '#eaf4f1',
+              accent: '#206355'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom scrollbar & visual polish */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0e2e28;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #17483e;
+      border-radius: 4px;
+      border: 1px solid #f5c76b;
+    }
+    .gold-gradient-text {
+      background: linear-gradient(135deg, #fff 30%, #f5c76b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .badge-inside {
+      background-color: #d1fae5;
+      color: #065f46;
+      border: 1px solid #10b981;
+    }
+    .badge-completed {
+      background-color: #f3f4f6;
+      color: #374151;
+      border: 1px solid #9ca3af;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex flex-col antialiased">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="bg-brand-darker border-b border-brand-gold/30 sticky top-0 z-50 shadow-xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <!-- Logo & Branding -->
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
+          <div class="w-11 h-11 rounded-xl bg-brand-dark border-2 border-brand-gold flex items-center justify-center shadow-lg">
+            <i class="fa-solid font-bold text-brand-gold text-xl fa-building-shield"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+              Shan's Elite Residency
+              <span class="text-xs px-2 py-0.5 rounded-full bg-brand-gold/20 text-brand-gold border border-brand-gold/40">VMS</span>
+            </h1>
+            <p class="text-xs text-brand-gold/80 font-medium">Shan's Elite Apartment Visitor System</p>
+          </div>
+        </div>
+
+        <!-- Desktop Navigation Links -->
+        <nav class="hidden md:flex space-x-1 lg:space-x-2">
+          <button onclick="switchTab('home')" id="nav-home" class="nav-btn text-slate-300 hover:text-brand-gold hover:bg-brand-dark px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center gap-2">
+            <i class="fa-solid fa-house"></i> Home
+          </button>
+          <button onclick="switchTab('add-visitor')" id="nav-add-visitor" class="nav-btn text-slate-300 hover:text-brand-gold hover:bg-brand-dark px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center gap-2">
+            <i class="fa-solid fa-user-plus"></i> Add Visitor
+          </button>
+          <button onclick="switchTab('visitors')" id="nav-visitors" class="nav-btn text-slate-300 hover:text-brand-gold hover:bg-brand-dark px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center gap-2">
+            <i class="fa-solid fa-users"></i> Visitors
+          </button>
+          <button onclick="switchTab('residents')" id="nav-residents" class="nav-btn text-slate-300 hover:text-brand-gold hover:bg-brand-dark px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center gap-2">
+            <i class="fa-solid fa-people-roof"></i> Residents
+          </button>
+          <button onclick="switchTab('visitor-entry')" id="nav-visitor-entry" class="nav-btn text-slate-300 hover:text-brand-gold hover:bg-brand-dark px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center gap-2">
+            <i class="fa-solid fa-right-to-bracket"></i> Visitor Entry
+          </button>
+          <button onclick="switchTab('visitor-log')" id="nav-visitor-log" class="nav-btn text-slate-300 hover:text-brand-gold hover:bg-brand-dark px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center gap-2">
+            <i class="fa-solid fa-clipboard-list"></i> Visitor Log
+          </button>
+        </nav>
+
+        <!-- Mobile Menu Button -->
+        <div class="md:hidden">
+          <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="p-2 rounded-md text-brand-gold hover:bg-brand-dark focus:outline-none">
+            <i class="fa-solid fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-menu" class="hidden md:hidden bg-brand-darker border-b border-brand-gold/30 px-4 pt-2 pb-4 space-y-2">
+      <button onclick="switchTab('home')" class="w-full text-left text-slate-200 hover:text-brand-gold hover:bg-brand-dark px-3 py-2 rounded-md font-medium flex items-center gap-3">
+        <i class="fa-solid fa-house text-brand-gold w-5"></i> Home
+      </button>
+      <button onclick="switchTab('add-visitor')" class="w-full text-left text-slate-200 hover:text-brand-gold hover:bg-brand-dark px-3 py-2 rounded-md font-medium flex items-center gap-3">
+        <i class="fa-solid fa-user-plus text-brand-gold w-5"></i> Add Visitor
+      </button>
+      <button onclick="switchTab('visitors')" class="w-full text-left text-slate-200 hover:text-brand-gold hover:bg-brand-dark px-3 py-2 rounded-md font-medium flex items-center gap-3">
+        <i class="fa-solid fa-users text-brand-gold w-5"></i> Visitors
+      </button>
+      <button onclick="switchTab('residents')" class="w-full text-left text-slate-200 hover:text-brand-gold hover:bg-brand-dark px-3 py-2 rounded-md font-medium flex items-center gap-3">
+        <i class="fa-solid fa-people-roof text-brand-gold w-5"></i> Residents
+      </button>
+      <button onclick="switchTab('visitor-entry')" class="w-full text-left text-slate-200 hover:text-brand-gold hover:bg-brand-dark px-3 py-2 rounded-md font-medium flex items-center gap-3">
+        <i class="fa-solid fa-right-to-bracket text-brand-gold w-5"></i> Visitor Entry
+      </button>
+      <button onclick="switchTab('visitor-log')" class="w-full text-left text-slate-200 hover:text-brand-gold hover:bg-brand-dark px-3 py-2 rounded-md font-medium flex items-center gap-3">
+        <i class="fa-solid fa-clipboard-list text-brand-gold w-5"></i> Visitor Log
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- PAGE 1: HOME TAB -->
+    <section id="page-home" class="tab-page space-y-8">
+      <!-- Hero Banner (Vertical Image Split Layout) -->
+      <div class="relative rounded-2xl overflow-hidden shadow-2xl border border-brand-gold/30 bg-brand-darker grid grid-cols-1 md:grid-cols-12 min-h-[420px]">
+        <div class="md:col-span-5 relative h-72 md:h-auto overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=90" 
+               alt="Luxury Apartment Building Exterior" 
+               class="w-full h-full object-cover object-center transform hover:scale-105 transition duration-700 brightness-95 contrast-105"
+               onerror="this.src='https://placehold.co/600x800/17483e/f5c76b?text=Shan%27s+Elite+Residency'">
+          <div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-slate-950/80 via-transparent to-transparent"></div>
+        </div>
+        <div class="md:col-span-7 p-6 sm:p-10 flex flex-col justify-center bg-gradient-to-br from-brand-darker via-slate-900 to-brand-dark">
+          <div class="inline-block px-3.5 py-1 mb-3 bg-brand-gold/20 border border-brand-gold rounded-full text-brand-gold text-xs font-bold uppercase tracking-wider w-max shadow-sm">
+            <i class="fa-solid fa-shield-halved mr-1"></i> Premium Security & Access Gateway
+          </div>
+          <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">Shan's Elite Residency</h2>
+          <p class="text-slate-300 mt-3 max-w-xl text-sm sm:text-base leading-relaxed">
+            Premier Visitor Management System — Ensuring seamless access control, real-time gate tracking, and elite resident security.
+          </p>
+          <div class="mt-6 flex flex-wrap gap-4">
+            <button onclick="switchTab('add-visitor')" class="bg-brand-gold text-slate-950 font-bold px-5 py-2.5 rounded-xl hover:bg-brand-goldhover transition shadow-lg flex items-center gap-2 text-sm">
+              <i class="fa-solid fa-user-plus"></i> New Visitor Check-in
+            </button>
+            <button onclick="switchTab('visitor-entry')" class="bg-brand-dark text-brand-gold border border-brand-gold/40 font-semibold px-5 py-2.5 rounded-xl hover:bg-brand-accent transition text-sm flex items-center gap-2">
+              <i class="fa-solid fa-right-to-bracket"></i> Record Gate Entry
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Dashboard Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Card 1 -->
+        <div class="bg-slate-800/80 backdrop-blur border border-brand-gold/30 rounded-xl p-6 shadow-lg flex items-center justify-between hover:border-brand-gold transition">
+          <div>
+            <p class="text-xs font-semibold uppercase text-slate-400">Total Visitors</p>
+            <h3 id="stat-total-visitors" class="text-3xl font-bold text-white mt-1">0</h3>
+            <span class="text-xs text-brand-gold mt-1 block"><i class="fa-solid fa-users text-xs mr-1"></i> Registered database</span>
+          </div>
+          <div class="w-14 h-14 rounded-full bg-brand-dark/60 border border-brand-gold/50 flex items-center justify-center text-brand-gold text-2xl">
+            <i class="fa-solid fa-user-group"></i>
+          </div>
+        </div>
+        <!-- Card 2 -->
+        <div class="bg-slate-800/80 backdrop-blur border border-emerald-500/40 rounded-xl p-6 shadow-lg flex items-center justify-between hover:border-emerald-500 transition">
+          <div>
+            <p class="text-xs font-semibold uppercase text-slate-400">Inside Now</p>
+            <h3 id="stat-inside-now" class="text-3xl font-bold text-emerald-400 mt-1">0</h3>
+            <span class="text-xs text-emerald-400 mt-1 block"><i class="fa-solid fa-circle text-xs mr-1 animate-pulse"></i> Active visitors inside</span>
+          </div>
+          <div class="w-14 h-14 rounded-full bg-emerald-950/60 border border-emerald-500/50 flex items-center justify-center text-emerald-400 text-2xl">
+            <i class="fa-solid fa-building-user"></i>
+          </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="bg-slate-800/80 backdrop-blur border border-slate-600 rounded-xl p-6 shadow-lg flex items-center justify-between hover:border-slate-500 transition">
+          <div>
+            <p class="text-xs font-semibold uppercase text-slate-400">Completed Visits</p>
+            <h3 id="stat-completed-visits" class="text-3xl font-bold text-slate-200 mt-1">0</h3>
+            <span class="text-xs text-slate-400 mt-1 block"><i class="fa-solid fa-check-double text-xs mr-1"></i> Safely exited</span>
+          </div>
+          <div class="w-14 h-14 rounded-full bg-slate-900 border border-slate-600 flex items-center justify-center text-slate-300 text-2xl">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+        </div>
+        <!-- Card 4 -->
+        <div class="bg-slate-800/80 backdrop-blur border border-brand-gold/30 rounded-xl p-6 shadow-lg flex items-center justify-between hover:border-brand-gold transition">
+          <div>
+            <p class="text-xs font-semibold uppercase text-slate-400">Total Residents</p>
+            <h3 id="stat-total-residents" class="text-3xl font-bold text-white mt-1">0</h3>
+            <span class="text-xs text-brand-gold mt-1 block"><i class="fa-solid fa-house-chimney text-xs mr-1"></i> Occupied apartments</span>
+          </div>
+          <div class="w-14 h-14 rounded-full bg-brand-dark/60 border border-brand-gold/50 flex items-center justify-center text-brand-gold text-2xl">
+            <i class="fa-solid fa-people-roof"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="bg-slate-800/90 border border-slate-700 rounded-xl p-6 shadow-md">
+        <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-bolt text-brand-gold"></i> Quick Actions
+        </h3>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <button onclick="switchTab('add-visitor')" class="bg-brand-dark hover:bg-brand-accent text-brand-gold border border-brand-gold/40 hover:border-brand-gold px-4 py-3 rounded-xl font-semibold text-sm transition flex flex-col items-center justify-center gap-2 text-center group">
+            <i class="fa-solid fa-user-plus text-2xl group-hover:scale-110 transition-transform"></i> Add New Visitor
+          </button>
+          <button onclick="switchTab('visitor-entry')" class="bg-brand-dark hover:bg-brand-accent text-brand-gold border border-brand-gold/40 hover:border-brand-gold px-4 py-3 rounded-xl font-semibold text-sm transition flex flex-col items-center justify-center gap-2 text-center group">
+            <i class="fa-solid fa-right-to-bracket text-2xl group-hover:scale-110 transition-transform"></i> Record Entry
+          </button>
+          <button onclick="switchTab('visitor-log')" class="bg-slate-700 hover:bg-slate-600 text-white border border-slate-500 px-4 py-3 rounded-xl font-semibold text-sm transition flex flex-col items-center justify-center gap-2 text-center group">
+            <i class="fa-solid fa-clock-rotate-left text-2xl group-hover:scale-110 transition-transform"></i> View Gate Log
+          </button>
+          <button onclick="switchTab('residents')" class="bg-slate-700 hover:bg-slate-600 text-white border border-slate-500 px-4 py-3 rounded-xl font-semibold text-sm transition flex flex-col items-center justify-center gap-2 text-center group">
+            <i class="fa-solid fa-address-book text-2xl group-hover:scale-110 transition-transform"></i> Manage Residents
+          </button>
+        </div>
+      </div>
+
+      <!-- Recent Check-ins Summary -->
+      <div class="bg-slate-800/90 border border-slate-700 rounded-xl p-6 shadow-md">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-list-check text-brand-gold"></i> Recent Gate Activity
+          </h3>
+          <button onclick="switchTab('visitor-log')" class="text-xs text-brand-gold hover:underline font-semibold">View All Log →</button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-300">
+            <thead class="bg-brand-darker text-brand-gold text-xs uppercase font-semibold">
+              <tr>
+                <th class="p-3">Visitor ID</th>
+                <th class="p-3">Name</th>
+                <th class="p-3">Flat No</th>
+                <th class="p-3">Entry Time</th>
+                <th class="p-3">Status</th>
+              </tr>
+            </thead>
+            <tbody id="home-recent-table" class="divide-y divide-slate-700">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 2: ADD VISITOR TAB -->
+    <section id="page-add-visitor" class="tab-page hidden space-y-6">
+      <div class="relative rounded-2xl overflow-hidden shadow-xl border border-brand-gold/30 bg-brand-darker grid grid-cols-1 md:grid-cols-12 min-h-[300px]">
+        <div class="md:col-span-4 relative h-64 md:h-auto overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=90" 
+               alt="Security Reception Checking Visitor" 
+               class="w-full h-full object-cover object-center brightness-95 contrast-105"
+               onerror="this.src='https://placehold.co/600x800/17483e/f5c76b?text=Add+Visitor'">
+          <div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-slate-950/80 via-transparent to-transparent"></div>
+        </div>
+        <div class="md:col-span-8 p-6 sm:p-8 flex flex-col justify-center bg-gradient-to-br from-brand-darker via-slate-900 to-brand-dark">
+          <h2 class="text-2xl sm:text-4xl font-bold text-white">Register New Visitor</h2>
+          <p class="text-slate-300 text-sm mt-2 max-w-xl">Create an official visitor profile in Shan's Elite Residency registry before allowing entrance.</p>
+        </div>
+      </div>
+
+      <!-- Add Visitor Form Card -->
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 sm:p-8 shadow-xl max-w-3xl mx-auto">
+        <!-- Success Alert Container -->
+        <div id="add-visitor-alert" class="hidden mb-6 p-4 rounded-xl bg-emerald-900/80 border border-emerald-500 text-emerald-200 flex items-center gap-3">
+          <i class="fa-solid fa-circle-check text-emerald-400 text-xl"></i>
+          <div>
+            <p class="font-bold">Success!</p>
+            <p class="text-sm">Visitor added successfully with assigned ID.</p>
+          </div>
+        </div>
+
+        <form id="add-visitor-form" onsubmit="handleAddVisitor(event)" class="space-y-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <!-- Visitor ID (Auto-generated) -->
+            <div>
+              <label class="block text-xs font-semibold uppercase text-brand-gold mb-2">Auto Visitor ID</label>
+              <input type="text" id="add-visitor-id" readonly class="w-full bg-slate-900 border border-brand-gold/40 rounded-xl px-4 py-3 text-white font-mono font-bold focus:outline-none cursor-not-allowed">
+            </div>
+
+            <!-- Full Name -->
+            <div>
+              <label class="block text-xs font-semibold uppercase text-slate-300 mb-2">Full Name *</label>
+              <input type="text" id="add-name" required placeholder="e.g. Ramesh Kumar" class="w-full bg-slate-900 border border-slate-700 focus:border-brand-gold rounded-xl px-4 py-3 text-white focus:outline-none transition">
+            </div>
+
+            <!-- Phone Number -->
+            <div>
+              <label class="block text-xs font-semibold uppercase text-slate-300 mb-2">Phone Number *</label>
+              <input type="tel" id="add-phone" required pattern="[0-9]{10}" title="10 digit phone number" placeholder="e.g. 9876543210" class="w-full bg-slate-900 border border-slate-700 focus:border-brand-gold rounded-xl px-4 py-3 text-white focus:outline-none transition">
+            </div>
+
+            <!-- Purpose -->
+            <div>
+              <label class="block text-xs font-semibold uppercase text-slate-300 mb-2">Purpose of Visit *</label>
+              <select id="add-purpose" required class="w-full bg-slate-900 border border-slate-700 focus:border-brand-gold rounded-xl px-4 py-3 text-white focus:outline-none transition">
+                <option value="Guest">Guest / Friend</option>
+                <option value="Delivery">Delivery / Courier</option>
+                <option value="Maintenance">Maintenance / Service</option>
+                <option value="Cab">Cab / Taxi Driver</option>
+                <option value="Vendor">Vendor / Official</option>
+              </select>
+            </div>
+
+            <!-- Flat Number -->
+            <div>
+              <label class="block text-xs font-semibold uppercase text-slate-300 mb-2">Visiting Flat Number *</label>
+              <input type="text" id="add-flat" required placeholder="e.g. A-101" class="w-full bg-slate-900 border border-slate-700 focus:border-brand-gold rounded-xl px-4 py-3 text-white focus:outline-none transition">
+            </div>
+
+            <!-- Vehicle Number -->
+            <div>
+              <label class="block text-xs font-semibold uppercase text-slate-300 mb-2">Vehicle Number (Optional)</label>
+              <input type="text" id="add-vehicle" placeholder="e.g. AP-39-AB-1234" class="w-full bg-slate-900 border border-slate-700 focus:border-brand-gold rounded-xl px-4 py-3 text-white focus:outline-none transition">
+            </div>
+          </div>
+
+          <div class="pt-4 flex justify-end gap-4">
+            <button type="reset" class="px-6 py-3 rounded-xl border border-slate-600 text-slate-300 hover:bg-slate-700 transition font-medium">Reset</button>
+            <button type="submit" class="px-8 py-3 rounded-xl bg-brand-gold text-slate-950 font-bold hover:bg-brand-goldhover transition shadow-lg flex items-center gap-2">
+              <i class="fa-solid fa-save"></i> Save Visitor
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- PAGE 3: VISITORS DIRECTORY TAB -->
+    <section id="page-visitors" class="tab-page hidden space-y-6">
+      <div class="relative rounded-2xl overflow-hidden shadow-xl border border-brand-gold/30 bg-brand-darker grid grid-cols-1 md:grid-cols-12 min-h-[300px]">
+        <div class="md:col-span-4 relative h-64 md:h-auto overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=800&q=90" 
+               alt="Visitors at Apartment Entrance" 
+               class="w-full h-full object-cover object-center brightness-95 contrast-105"
+               onerror="this.src='https://placehold.co/600x800/17483e/f5c76b?text=Visitors+Directory'">
+          <div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-slate-950/80 via-transparent to-transparent"></div>
+        </div>
+        <div class="md:col-span-8 p-6 sm:p-8 flex flex-col justify-center bg-gradient-to-br from-brand-darker via-slate-900 to-brand-dark">
+          <h2 class="text-2xl sm:text-4xl font-bold text-white">Visitor Directory</h2>
+          <p class="text-slate-300 text-sm mt-2 max-w-xl">Manage, edit, filter, and inspect registered apartment visitors.</p>
+        </div>
+      </div>
+
+      <!-- Controls & Filter Bar -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-md flex flex-col md:flex-row gap-4 justify-between items-center">
+        <!-- Search input -->
+        <div class="relative w-full md:w-96">
+          <i class="fa-solid fa-search absolute left-4 top-3.5 text-slate-400"></i>
+          <input type="text" id="visitors-search" oninput="renderVisitorsTable()" placeholder="Search Name, Phone, Flat, Visitor ID..." class="w-full bg-slate-900 border border-slate-700 focus:border-brand-gold rounded-xl pl-11 pr-4 py-2.5 text-slate-200 text-sm focus:outline-none">
+        </div>
+
+        <!-- Filter Dropdown -->
+        <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+          <label class="text-xs font-semibold text-slate-400 uppercase">Filter Status:</label>
+          <select id="visitors-filter-status" onchange="renderVisitorsTable()" class="bg-slate-900 border border-slate-700 focus:border-brand-gold rounded-xl px-4 py-2 text-slate-200 text-sm focus:outline-none">
+            <option value="ALL">All Statuses</option>
+            <option value="Inside">Inside Now</option>
+            <option value="Completed">Completed</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Table Container -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-xl">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-300">
+            <thead class="bg-brand-darker text-brand-gold text-xs uppercase font-semibold">
+              <tr>
+                <th class="p-4">Visitor ID</th>
+                <th class="p-4">Name</th>
+                <th class="p-4">Phone</th>
+                <th class="p-4">Flat No</th>
+                <th class="p-4">Purpose</th>
+                <th class="p-4">Status</th>
+                <th class="p-4 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="visitors-table-body" class="divide-y divide-slate-700">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 4: RESIDENTS TAB -->
+    <section id="page-residents" class="tab-page hidden space-y-6">
+      <div class="relative rounded-2xl overflow-hidden shadow-xl border border-brand-gold/30 bg-brand-darker grid grid-cols-1 md:grid-cols-12 min-h-[300px]">
+        <div class="md:col-span-4 relative h-64 md:h-auto overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=90" 
+               alt="Happy Family in Apartment" 
+               class="w-full h-full object-cover object-center brightness-95 contrast-105"
+               onerror="this.src='https://placehold.co/600x800/17483e/f5c76b?text=Residents+Directory'">
+          <div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-slate-950/80 via-transparent to-transparent"></div>
+        </div>
+        <div class="md:col-span-8 p-6 sm:p-8 flex flex-col justify-center bg-gradient-to-br from-brand-darker via-slate-900 to-brand-dark">
+          <h2 class="text-2xl sm:text-4xl font-bold text-white">Resident Directory</h2>
+          <p class="text-slate-300 text-sm mt-2 max-w-xl">Shan's Elite Residency primary flat owners and residents list.</p>
+        </div>
+      </div>
+
+      <!-- Controls Bar -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-md flex flex-col sm:flex-row gap-4 justify-between items-center">
+        <div class="relative w-full sm:w-80">
+          <i class="fa-solid fa-search absolute left-4 top-3.5 text-slate-400"></i>
+          <input type="text" id="residents-search" oninput="renderResidentsTable()" placeholder="Search Resident Name, Flat or Phone..." class="w-full bg-slate-900 border border-slate-700 focus:border-brand-gold rounded-xl pl-11 pr-4 py-2.5 text-slate-200 text-sm focus:outline-none">
+        </div>
+        <div class="text-xs text-brand-gold bg-brand-dark/50 border border-brand-gold/30 px-3 py-2 rounded-lg">
+          <i class="fa-solid fa-shield-halved mr-1"></i> Official Residency Records
+        </div>
+      </div>
+
+      <!-- Residents Table -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-xl">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-300">
+            <thead class="bg-brand-darker text-brand-gold text-xs uppercase font-semibold">
+              <tr>
+                <th class="p-4">Flat Number</th>
+                <th class="p-4">Primary Resident</th>
+                <th class="p-4">Block / Tower</th>
+                <th class="p-4">Contact Phone</th>
+                <th class="p-4">Occupancy</th>
+                <th class="p-4 text-center">Recent Visits</th>
+              </tr>
+            </thead>
+            <tbody id="residents-table-body" class="divide-y divide-slate-700">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 5: VISITOR ENTRY (Gate Check-in Control) -->
+    <section id="page-visitor-entry" class="tab-page hidden space-y-6">
+      <div class="relative rounded-2xl overflow-hidden shadow-xl border border-brand-gold/30 bg-brand-darker grid grid-cols-1 md:grid-cols-12 min-h-[300px]">
+        <div class="md:col-span-4 relative h-64 md:h-auto overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&w=800&q=90" 
+               alt="Security Gate Control" 
+               class="w-full h-full object-cover object-center brightness-95 contrast-105"
+               onerror="this.src='https://placehold.co/600x800/17483e/f5c76b?text=Security+Gate+Entry'">
+          <div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-slate-950/80 via-transparent to-transparent"></div>
+        </div>
+        <div class="md:col-span-8 p-6 sm:p-8 flex flex-col justify-center bg-gradient-to-br from-brand-darker via-slate-900 to-brand-dark">
+          <h2 class="text-2xl sm:text-4xl font-bold text-white">Visitor Entry Control</h2>
+          <p class="text-slate-300 text-sm mt-2 max-w-xl">Record gate entry timestamp and manage active status with live time validation.</p>
+        </div>
+      </div>
+
+      <!-- Live Clock Banner -->
+      <div class="bg-brand-dark border border-brand-gold/40 rounded-xl p-4 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-brand-gold text-slate-950 flex items-center justify-center font-bold">
+            <i class="fa-solid fa-clock"></i>
+          </div>
+          <div>
+            <span class="text-xs text-brand-gold uppercase tracking-wider font-semibold">Live System Clock (IST)</span>
+            <div id="live-ist-clock" class="text-lg sm:text-xl font-mono font-bold text-white">--</div>
+          </div>
+        </div>
+        <div class="text-xs bg-slate-900/60 border border-slate-700 text-slate-300 px-3 py-1.5 rounded-lg">
+          <i class="fa-solid fa-circle-info text-brand-gold mr-1"></i> Strict Rule: Past Datetimes Disabled
+        </div>
+      </div>
+
+      <!-- Visitor Entry Form -->
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 sm:p-8 shadow-xl max-w-3xl mx-auto">
+        
+        <!-- Green Success Alert Banner -->
+        <div id="entry-success-alert" class="hidden mb-6 p-4 rounded-xl bg-emerald-950 border border-emerald-500 text-emerald-300 flex items-center gap-3 animate-fade">
+          <i class="fa-solid fa-circle-check text-emerald-400 text-2xl"></i>
+          <div>
+            <p class="font-bold text-white">Visitor entry saved successfully!</p>
+            <p class="text-xs">The record has been written to the gate log and active status updated.</p>
+          </div>
+        </div>
+
+        <form id="visitor-entry-form" onsubmit="handleSaveVisitorEntry(event)" class="space-y-6">
+          
+          <!-- Select Visitor -->
+          <div>
+            <label class="block text-xs font-semibold uppercase text-brand-gold mb-2">Select Visitor *</label>
+            <select id="entry-visitor-select" required onchange="populateVisitorEntryDetails()" class="w-full bg-slate-900 border border-slate-700 focus:border-brand-gold rounded-xl px-4 py-3 text-white focus:outline-none">
+              <option value="">-- Select Registered Visitor --</option>
+            </select>
+          </div>
+
+          <!-- Quick Preview Details -->
+          <div id="entry-visitor-preview" class="hidden p-4 rounded-xl bg-slate-900/70 border border-slate-700 grid grid-cols-2 sm:grid-cols-3 gap-4 text-xs">
+            <div>
+              <span class="text-slate-400">Phone:</span>
+              <p id="prev-phone" class="font-bold text-white">-</p>
+            </div>
+            <div>
+              <span class="text-slate-400">Target Flat:</span>
+              <p id="prev-flat" class="font-bold text-brand-gold">-</p>
+            </div>
+            <div>
+              <span class="text-slate-400">Purpose:</span>
+              <p id="prev-purpose" class="font-bold text-white">-</p>
+            </div>
+          </div>
+
+          <!-- Entry & Exit Date Time Inputs -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <!-- Entry Date Time -->
+            <div>
+              <label class="block text-xs font-semibold uppercase text-slate-300 mb-2">
+                Entry Date & Time * <span class="text-brand-gold text-[10px]">(Current or Future Only)</span>
+              </label>
+              <input type="datetime-local" id="entry-date-time" required onchange="validateEntryTime(this)" class="w-full bg-slate-900 border border-slate-700 focus:border-brand-gold rounded-xl px-4 py-3 text-white focus:outline-none">
+              <span class="text-[11px] text-slate-400 mt-1 block">Past time selection triggers clear & alert.</span>
+            </div>
+
+            <!-- Exit Date Time -->
+            <div>
+              <label class="block text-xs font-semibold uppercase text-slate-300 mb-2">
+                Exit Date & Time <span class="text-slate-400 text-[10px]">(Optional for Inside status)</span>
+              </label>
+              <input type="datetime-local" id="exit-date-time" onchange="validateExitTime(this)" class="w-full bg-slate-900 border border-slate-700 focus:border-brand-gold rounded-xl px-4 py-3 text-white focus:outline-none">
+              <span class="text-[11px] text-slate-400 mt-1 block">Must be after Entry Date & Time.</span>
+            </div>
+          </div>
+
+          <!-- Visit Status -->
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-300 mb-2">Visit Status *</label>
+            <div class="grid grid-cols-2 gap-4">
+              <label class="flex items-center gap-3 p-4 rounded-xl bg-slate-900 border border-emerald-500/50 cursor-pointer hover:border-emerald-500">
+                <input type="radio" name="entry-status" value="Inside" checked class="accent-emerald-500 w-4 h-4">
+                <div>
+                  <span class="block font-bold text-emerald-400 text-sm">Inside Now</span>
+                  <span class="text-xs text-slate-400">Currently inside premises</span>
+                </div>
+              </label>
+              <label class="flex items-center gap-3 p-4 rounded-xl bg-slate-900 border border-slate-600 cursor-pointer hover:border-slate-400">
+                <input type="radio" name="entry-status" value="Completed" class="accent-slate-400 w-4 h-4">
+                <div>
+                  <span class="block font-bold text-slate-300 text-sm">Completed</span>
+                  <span class="text-xs text-slate-400">Visit finished & exited</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Save Button -->
+          <div class="pt-4 flex justify-end gap-4">
+            <button type="submit" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-brand-gold text-slate-950 font-bold hover:bg-brand-goldhover transition shadow-xl flex items-center justify-center gap-2 text-base">
+              <i class="fa-solid fa-check-to-slot"></i> Save Visitor Entry
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- PAGE 6: VISITOR LOG TAB -->
+    <section id="page-visitor-log" class="tab-page hidden space-y-6">
+      <div class="relative rounded-2xl overflow-hidden shadow-xl border border-brand-gold/30 bg-brand-darker grid grid-cols-1 md:grid-cols-12 min-h-[300px]">
+        <div class="md:col-span-4 relative h-64 md:h-auto overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=800&q=90" 
+               alt="CCTV & Log Security Room" 
+               class="w-full h-full object-cover object-center brightness-95 contrast-105"
+               onerror="this.src='https://placehold.co/600x800/17483e/f5c76b?text=Gate+Visitor+Log'">
+          <div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-slate-950/80 via-transparent to-transparent"></div>
+        </div>
+        <div class="md:col-span-8 p-6 sm:p-8 flex flex-col justify-center bg-gradient-to-br from-brand-darker via-slate-900 to-brand-dark">
+          <h2 class="text-2xl sm:text-4xl font-bold text-white">Full Gate Visitor Log</h2>
+          <p class="text-slate-300 text-sm mt-2 max-w-xl">Audit trail of all recorded entries, timestamps, and exit logs.</p>
+        </div>
+      </div>
+
+      <!-- Controls & Search -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-md flex flex-col md:flex-row gap-4 justify-between items-center">
+        <!-- Search -->
+        <div class="relative w-full md:w-80">
+          <i class="fa-solid fa-search absolute left-4 top-3.5 text-slate-400"></i>
+          <input type="text" id="log-search" oninput="renderVisitorLogTable()" placeholder="Search Log by ID, Name, Flat..." class="w-full bg-slate-900 border border-slate-700 focus:border-brand-gold rounded-xl pl-11 pr-4 py-2 text-slate-200 text-sm focus:outline-none">
+        </div>
+
+        <!-- Filter Options -->
+        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+          <select id="log-status-filter" onchange="renderVisitorLogTable()" class="bg-slate-900 border border-slate-700 focus:border-brand-gold rounded-xl px-3 py-2 text-slate-200 text-sm focus:outline-none">
+            <option value="ALL">All Log Statuses</option>
+            <option value="Inside">Inside Now</option>
+            <option value="Completed">Completed</option>
+          </select>
+
+          <button onclick="clearAllLogs()" class="text-xs bg-red-950/60 text-red-300 hover:bg-red-900 border border-red-800 px-3 py-2 rounded-xl transition font-medium">
+            <i class="fa-solid fa-trash-can mr-1"></i> Reset Logs
+          </button>
+        </div>
+      </div>
+
+      <!-- Log Table -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-xl">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-300">
+            <thead class="bg-brand-darker text-brand-gold text-xs uppercase font-semibold">
+              <tr>
+                <th class="p-4">Visitor ID</th>
+                <th class="p-4">Name & Phone</th>
+                <th class="p-4">Flat No</th>
+                <th class="p-4">Entry Timestamp</th>
+                <th class="p-4">Exit Timestamp</th>
+                <th class="p-4">Status</th>
+                <th class="p-4 text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody id="visitor-log-table-body" class="divide-y divide-slate-700">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- EDIT VISITOR MODAL -->
+  <div id="edit-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-800 border border-brand-gold/40 rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-user-pen text-brand-gold"></i> Edit Visitor Details
+        </h3>
+        <button onclick="closeEditModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
+
+      <form id="edit-visitor-form" onsubmit="handleSaveEditVisitor(event)" class="space-y-4">
+        <input type="hidden" id="edit-id">
+        <div>
+          <label class="block text-xs uppercase font-semibold text-slate-300 mb-1">Full Name</label>
+          <input type="text" id="edit-name" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-gold">
+        </div>
+        <div>
+          <label class="block text-xs uppercase font-semibold text-slate-300 mb-1">Phone Number</label>
+          <input type="tel" id="edit-phone" required pattern="[0-9]{10}" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-gold">
+        </div>
+        <div>
+          <label class="block text-xs uppercase font-semibold text-slate-300 mb-1">Flat Number</label>
+          <input type="text" id="edit-flat" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-gold">
+        </div>
+        <div>
+          <label class="block text-xs uppercase font-semibold text-slate-300 mb-1">Purpose</label>
+          <select id="edit-purpose" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-gold">
+            <option value="Guest">Guest</option>
+            <option value="Delivery">Delivery</option>
+            <option value="Maintenance">Maintenance</option>
+            <option value="Cab">Cab</option>
+            <option value="Vendor">Vendor</option>
+          </select>
+        </div>
+
+        <div class="pt-2 flex justify-end gap-3">
+          <button type="button" onclick="closeEditModal()" class="px-4 py-2 rounded-xl border border-slate-600 text-slate-300 text-sm font-medium">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-brand-gold text-slate-950 font-bold text-sm hover:bg-brand-goldhover">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-brand-darker border-t border-brand-gold/20 py-6 mt-12 text-center text-xs text-slate-400">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-brand-gold"></span>
+        <span class="font-semibold text-slate-200">Shan's Elite Residency & Apartment Visitor DB</span>
+      </div>
+      <div>
+        Crafted with love by <span class="text-brand-gold font-bold">Shanmukhi</span> | Shan's Elite Residency, Apartment Visitor DB © 2026.
+      </div>
+    </div>
+  </footer>
+
+  <!-- APPLICATION SCRIPT LOGIC -->
+  <script>
+    // --- LOCAL STORAGE KEYS ---
+    const STORAGE_KEY_VISITORS = "shans_elite_visitors_v1";
+    const STORAGE_KEY_RESIDENTS = "shans_elite_residents_v1";
+
+    // --- SEED SAMPLE DATA IF EMPTY ---
+    const defaultResidents = [
+      { flat: "A-101", name: "Srinivas Rao", phone: "9848012345", block: "Tower A", occupants: 4 },
+      { flat: "A-202", name: "Ananya Reddy", phone: "9848023456", block: "Tower A", occupants: 3 },
+      { flat: "B-301", name: "Vikram Sharma", phone: "9848034567", block: "Tower B", occupants: 2 },
+      { flat: "B-404", name: "Priya Nair", phone: "9848045678", block: "Tower B", occupants: 5 },
+      { flat: "C-102", name: "Karthik Verma", phone: "9848056789", block: "Tower C", occupants: 3 },
+      { flat: "C-504", name: "Shanmukhi Devi", phone: "9848099999", block: "Tower C (Penthouse)", occupants: 4 }
+    ];
+
+    const defaultVisitors = [
+      {
+        id: "VIS-1001",
+        name: "Rajesh Kumar",
+        phone: "9123456780",
+        flat: "A-101",
+        purpose: "Guest",
+        vehicle: "AP-39-AA-1122",
+        status: "Inside",
+        entryTime: getRelativeISO(-45), // 45 mins ago
+        exitTime: ""
+      },
+      {
+        id: "VIS-1002",
+        name: "Amazon Courier Boy",
+        phone: "9123456781",
+        flat: "B-301",
+        purpose: "Delivery",
+        vehicle: "AP-39-DL-9988",
+        status: "Completed",
+        entryTime: getRelativeISO(-120), // 2 hours ago
+        exitTime: getRelativeISO(-90)
+      },
+      {
+        id: "VIS-1003",
+        name: "Suresh Plumber",
+        phone: "9123456782",
+        flat: "C-102",
+        purpose: "Maintenance",
+        vehicle: "N/A",
+        status: "Inside",
+        entryTime: getRelativeISO(-25),
+        exitTime: ""
+      },
+      {
+        id: "VIS-1004",
+        name: "Uber Driver - Mahesh",
+        phone: "9123456783",
+        flat: "A-202",
+        purpose: "Cab",
+        vehicle: "AP-09-UB-4433",
+        status: "Completed",
+        entryTime: getRelativeISO(-300),
+        exitTime: getRelativeISO(-280)
+      },
+      {
+        id: "VIS-1005",
+        name: "Sunita (Guest)",
+        phone: "9123456784",
+        flat: "C-504",
+        purpose: "Guest",
+        vehicle: "TS-07-FF-5544",
+        status: "Completed",
+        entryTime: getRelativeISO(-400),
+        exitTime: getRelativeISO(-350)
+      }
+    ];
+
+    // Helper for relative past ISO dates
+    function getRelativeISO(minutesOffset) {
+      const d = new Date();
+      d.setMinutes(d.getMinutes() + minutesOffset);
+      return d.toISOString();
+    }
+
+    // Load data from LocalStorage
+    function getVisitors() {
+      const data = localStorage.getItem(STORAGE_KEY_VISITORS);
+      if (!data) {
+        localStorage.setItem(STORAGE_KEY_VISITORS, JSON.stringify(defaultVisitors));
+        return defaultVisitors;
+      }
+      return JSON.parse(data);
+    }
+
+    function saveVisitors(visitors) {
+      localStorage.setItem(STORAGE_KEY_VISITORS, JSON.stringify(visitors));
+      updateDashboardStats();
+    }
+
+    function getResidents() {
+      const data = localStorage.getItem(STORAGE_KEY_RESIDENTS);
+      if (!data) {
+        localStorage.setItem(STORAGE_KEY_RESIDENTS, JSON.stringify(defaultResidents));
+        return defaultResidents;
+      }
+      return JSON.parse(data);
+    }
+
+    // --- TAB SWITCHING ROUTER ---
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-page').forEach(page => page.classList.add('hidden'));
+      document.getElementById('page-' + tabId).classList.remove('hidden');
+
+      // Update Nav active style
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('text-brand-gold', 'bg-brand-dark', 'font-bold');
+        btn.classList.add('text-slate-300');
+      });
+      const activeBtn = document.getElementById('nav-' + tabId);
+      if (activeBtn) {
+        activeBtn.classList.add('text-brand-gold', 'bg-brand-dark', 'font-bold');
+      }
+
+      // Close mobile drawer
+      document.getElementById('mobile-menu').classList.add('hidden');
+
+      // Page specific initialization
+      if (tabId === 'home') {
+        renderHomeRecentTable();
+      } else if (tabId === 'add-visitor') {
+        prepareAddVisitorForm();
+      } else if (tabId === 'visitors') {
+        renderVisitorsTable();
+      } else if (tabId === 'residents') {
+        renderResidentsTable();
+      } else if (tabId === 'visitor-entry') {
+        prepareVisitorEntryPage();
+      } else if (tabId === 'visitor-log') {
+        renderVisitorLogTable();
+      }
+      updateDashboardStats();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggleMobileMenu() {
+      document.getElementById('mobile-menu').classList.toggle('hidden');
+    }
+
+    // --- LIVE CLOCK & TIME VALIDATION RULES ---
+    function updateLiveClock() {
+      const clockElem = document.getElementById('live-ist-clock');
+      if (!clockElem) return;
+      const now = new Date();
+      // Format in Indian Standard Format
+      const options = { 
+        day: '2-digit', 
+        month: 'short', 
+        year: 'numeric', 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit', 
+        hour12: true, 
+        timeZone: 'Asia/Kolkata' 
+      };
+      const formatted = new Intl.DateTimeFormat('en-IN', options).format(now);
+      clockElem.innerText = formatted + " IST";
+    }
+
+    function getNowFormattedForInput() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+
+    // Strict time validation on Entry Time Input
+    function validateEntryTime(inputElem) {
+      if (!inputElem.value) return;
+
+      const selectedDate = new Date(inputElem.value);
+      const now = new Date();
+
+      // Allow 2 minute tolerance for minor delay in filling form
+      const nowWithTolerance = new Date(now.getTime() - 2 * 60 * 1000);
+
+      if (selectedDate < nowWithTolerance) {
+        alert("Past entry time is not allowed");
+        inputElem.value = getNowFormattedForInput();
+      }
+
+      // Re-validate exit time if present
+      const exitElem = document.getElementById('exit-date-time');
+      if (exitElem && exitElem.value) {
+        validateExitTime(exitElem);
+      }
+    }
+
+    // Strict time validation on Exit Time Input
+    function validateExitTime(exitElem) {
+      if (!exitElem.value) return;
+
+      const entryElem = document.getElementById('entry-date-time');
+      if (!entryElem.value) return;
+
+      const entryDate = new Date(entryElem.value);
+      const exitDate = new Date(exitElem.value);
+
+      if (exitDate <= entryDate) {
+        alert("Exit Date & Time must be after Entry Date & Time!");
+        exitElem.value = "";
+      }
+    }
+
+    // --- DASHBOARD CALCULATIONS ---
+    function updateDashboardStats() {
+      const visitors = getVisitors();
+      const residents = getResidents();
+
+      const total = visitors.length;
+      const inside = visitors.filter(v => v.status === 'Inside').length;
+      const completed = visitors.filter(v => v.status === 'Completed').length;
+      const totalResidents = residents.length;
+
+      document.getElementById('stat-total-visitors').innerText = total;
+      document.getElementById('stat-inside-now').innerText = inside;
+      document.getElementById('stat-completed-visits').innerText = completed;
+      document.getElementById('stat-total-residents').innerText = totalResidents;
+    }
+
+    // --- PAGE 1: HOME PAGE ---
+    function renderHomeRecentTable() {
+      const visitors = getVisitors();
+      const tbody = document.getElementById('home-recent-table');
+      tbody.innerHTML = '';
+
+      const recent = [...visitors].slice(-5).reverse();
+      if (recent.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">No recent visitor activity recorded.</td></tr>`;
+        return;
+      }
+
+      recent.forEach(v => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-700/50 transition';
+        const badgeClass = v.status === 'Inside' ? 'badge-inside' : 'badge-completed';
+        const entryFormatted = v.entryTime ? formatDateDisplay(v.entryTime) : 'N/A';
+
+        tr.innerHTML = `
+          <td class="p-3 font-mono font-semibold text-brand-gold">${v.id}</td>
+          <td class="p-3 font-medium text-white">${escapeHtml(v.name)}</td>
+          <td class="p-3">${escapeHtml(v.flat)}</td>
+          <td class="p-3 text-xs text-slate-400">${entryFormatted}</td>
+          <td class="p-3">
+            <span class="text-xs px-2.5 py-1 rounded-full font-bold ${badgeClass}">
+              ${v.status}
+            </span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // --- PAGE 2: ADD VISITOR ---
+    function prepareAddVisitorForm() {
+      const visitors = getVisitors();
+      const nextId = "VIS-" + (1001 + visitors.length);
+      document.getElementById('add-visitor-id').value = nextId;
+      document.getElementById('add-visitor-alert').classList.add('hidden');
+    }
+
+    function handleAddVisitor(e) {
+      e.preventDefault();
+      const visitors = getVisitors();
+
+      const newVisitor = {
+        id: document.getElementById('add-visitor-id').value,
+        name: document.getElementById('add-name').value.trim(),
+        phone: document.getElementById('add-phone').value.trim(),
+        flat: document.getElementById('add-flat').value.trim().toUpperCase(),
+        purpose: document.getElementById('add-purpose').value,
+        vehicle: document.getElementById('add-vehicle').value.trim() || 'N/A',
+        status: 'Inside',
+        entryTime: new Date().toISOString(),
+        exitTime: ''
+      };
+
+      visitors.push(newVisitor);
+      saveVisitors(visitors);
+
+      // Show alert
+      const alertElem = document.getElementById('add-visitor-alert');
+      alertElem.classList.remove('hidden');
+
+      // Reset form & generate next ID
+      document.getElementById('add-visitor-form').reset();
+      prepareAddVisitorForm();
+
+      setTimeout(() => {
+        alertElem.classList.add('hidden');
+      }, 4000);
+    }
+
+    // --- PAGE 3: VISITORS TAB ---
+    function renderVisitorsTable() {
+      const visitors = getVisitors();
+      const search = document.getElementById('visitors-search').value.toLowerCase();
+      const filterStatus = document.getElementById('visitors-filter-status').value;
+      const tbody = document.getElementById('visitors-table-body');
+      tbody.innerHTML = '';
+
+      const filtered = visitors.filter(v => {
+        const matchesSearch = v.name.toLowerCase().includes(search) ||
+                              v.phone.includes(search) ||
+                              v.flat.toLowerCase().includes(search) ||
+                              v.id.toLowerCase().includes(search);
+        const matchesStatus = filterStatus === 'ALL' || v.status === filterStatus;
+        return matchesSearch && matchesStatus;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-500">No matching visitors found.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(v => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-700/50 transition';
+        const badgeClass = v.status === 'Inside' ? 'badge-inside' : 'badge-completed';
+
+        tr.innerHTML = `
+          <td class="p-4 font-mono font-bold text-brand-gold">${v.id}</td>
+          <td class="p-4 font-medium text-white">${escapeHtml(v.name)}</td>
+          <td class="p-4">${escapeHtml(v.phone)}</td>
+          <td class="p-4"><span class="bg-slate-900 border border-slate-700 px-2.5 py-1 rounded text-xs font-bold text-slate-200">${escapeHtml(v.flat)}</span></td>
+          <td class="p-4">${escapeHtml(v.purpose)}</td>
+          <td class="p-4">
+            <span class="text-xs px-2.5 py-1 rounded-full font-bold ${badgeClass}">${v.status}</span>
+          </td>
+          <td class="p-4 text-center space-x-2">
+            <button onclick="openEditModal('${v.id}')" title="Edit Visitor" class="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-200 text-xs">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <button onclick="toggleVisitorStatus('${v.id}')" title="Toggle Status" class="p-2 bg-brand-dark hover:bg-brand-accent rounded-lg text-brand-gold text-xs border border-brand-gold/40">
+              <i class="fa-solid fa-arrows-rotate"></i>
+            </button>
+            <button onclick="deleteVisitor('${v.id}')" title="Delete Visitor" class="p-2 bg-red-950 hover:bg-red-900 text-red-300 rounded-lg text-xs border border-red-800">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function toggleVisitorStatus(id) {
+      let visitors = getVisitors();
+      visitors = visitors.map(v => {
+        if (v.id === id) {
+          const newStatus = v.status === 'Inside' ? 'Completed' : 'Inside';
+          const newExit = newStatus === 'Completed' ? new Date().toISOString() : '';
+          return { ...v, status: newStatus, exitTime: newExit };
+        }
+        return v;
+      });
+      saveVisitors(visitors);
+      renderVisitorsTable();
+    }
+
+    function deleteVisitor(id) {
+      if (confirm(`Are you sure you want to delete visitor ${id}?`)) {
+        let visitors = getVisitors();
+        visitors = visitors.filter(v => v.id !== id);
+        saveVisitors(visitors);
+        renderVisitorsTable();
+      }
+    }
+
+    // --- EDIT MODAL ---
+    function openEditModal(id) {
+      const visitors = getVisitors();
+      const v = visitors.find(item => item.id === id);
+      if (!v) return;
+
+      document.getElementById('edit-id').value = v.id;
+      document.getElementById('edit-name').value = v.name;
+      document.getElementById('edit-phone').value = v.phone;
+      document.getElementById('edit-flat').value = v.flat;
+      document.getElementById('edit-purpose').value = v.purpose;
+
+      document.getElementById('edit-modal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      document.getElementById('edit-modal').classList.add('hidden');
+    }
+
+    function handleSaveEditVisitor(e) {
+      e.preventDefault();
+      const id = document.getElementById('edit-id').value;
+      let visitors = getVisitors();
+
+      visitors = visitors.map(v => {
+        if (v.id === id) {
+          return {
+            ...v,
+            name: document.getElementById('edit-name').value.trim(),
+            phone: document.getElementById('edit-phone').value.trim(),
+            flat: document.getElementById('edit-flat').value.trim().toUpperCase(),
+            purpose: document.getElementById('edit-purpose').value
+          };
+        }
+        return v;
+      });
+
+      saveVisitors(visitors);
+      closeEditModal();
+      renderVisitorsTable();
+    }
+
+    // --- PAGE 4: RESIDENTS TAB ---
+    function renderResidentsTable() {
+      const residents = getResidents();
+      const visitors = getVisitors();
+      const search = document.getElementById('residents-search').value.toLowerCase();
+      const tbody = document.getElementById('residents-table-body');
+      tbody.innerHTML = '';
+
+      const filtered = residents.filter(r => 
+        r.name.toLowerCase().includes(search) ||
+        r.flat.toLowerCase().includes(search) ||
+        r.phone.includes(search)
+      );
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500">No residents match your search query.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(r => {
+        // Calculate visits targeting this flat
+        const visitCount = visitors.filter(v => v.flat.toUpperCase() === r.flat.toUpperCase()).length;
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-700/50 transition';
+
+        tr.innerHTML = `
+          <td class="p-4 font-bold text-brand-gold">${escapeHtml(r.flat)}</td>
+          <td class="p-4 font-semibold text-white">${escapeHtml(r.name)}</td>
+          <td class="p-4 text-xs text-slate-300">${escapeHtml(r.block)}</td>
+          <td class="p-4 text-slate-300">${escapeHtml(r.phone)}</td>
+          <td class="p-4 text-xs text-slate-400"><i class="fa-solid fa-users text-xs mr-1"></i> ${r.occupants} Members</td>
+          <td class="p-4 text-center">
+            <span class="bg-brand-dark/80 text-brand-gold border border-brand-gold/40 px-3 py-1 rounded-full text-xs font-bold">
+              ${visitCount} Total Visits
+            </span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // --- PAGE 5: VISITOR ENTRY GATE CONTROL ---
+    function prepareVisitorEntryPage() {
+      const visitors = getVisitors();
+      const select = document.getElementById('entry-visitor-select');
+      select.innerHTML = '<option value="">-- Select Registered Visitor --</option>';
+
+      visitors.forEach(v => {
+        const opt = document.createElement('option');
+        opt.value = v.id;
+        opt.innerText = `${v.id} - ${v.name} (${v.flat})`;
+        select.appendChild(opt);
+      });
+
+      // Set min time attribute dynamically to NOW
+      const nowStr = getNowFormattedForInput();
+      const entryTimeInput = document.getElementById('entry-date-time');
+      entryTimeInput.min = nowStr;
+      entryTimeInput.value = nowStr;
+
+      document.getElementById('exit-date-time').value = '';
+      document.getElementById('entry-success-alert').classList.add('hidden');
+      document.getElementById('entry-visitor-preview').classList.add('hidden');
+    }
+
+    function populateVisitorEntryDetails() {
+      const selectVal = document.getElementById('entry-visitor-select').value;
+      const previewBox = document.getElementById('entry-visitor-preview');
+
+      if (!selectVal) {
+        previewBox.classList.add('hidden');
+        return;
+      }
+
+      const visitors = getVisitors();
+      const v = visitors.find(item => item.id === selectVal);
+      if (v) {
+        document.getElementById('prev-phone').innerText = v.phone;
+        document.getElementById('prev-flat').innerText = v.flat;
+        document.getElementById('prev-purpose').innerText = v.purpose;
+        previewBox.classList.remove('hidden');
+      }
+    }
+
+    function handleSaveVisitorEntry(e) {
+      e.preventDefault();
+
+      const id = document.getElementById('entry-visitor-select').value;
+      const entryTimeVal = document.getElementById('entry-date-time').value;
+      const exitTimeVal = document.getElementById('exit-date-time').value;
+      const selectedStatus = document.querySelector('input[name="entry-status"]:checked').value;
+
+      if (!id) {
+        alert("Please select a valid visitor.");
+        return;
+      }
+
+      // Re-verify strictly that past time wasn't bypassed
+      const entryDate = new Date(entryTimeVal);
+      const now = new Date();
+      if (entryDate < new Date(now.getTime() - 2 * 60 * 1000)) {
+        alert("Past entry time is not allowed");
+        document.getElementById('entry-date-time').value = getNowFormattedForInput();
+        return;
+      }
+
+      if (exitTimeVal && new Date(exitTimeVal) <= entryDate) {
+        alert("Exit Date & Time must be after Entry Date & Time!");
+        return;
+      }
+
+      let visitors = getVisitors();
+      visitors = visitors.map(v => {
+        if (v.id === id) {
+          return {
+            ...v,
+            entryTime: new Date(entryTimeVal).toISOString(),
+            exitTime: exitTimeVal ? new Date(exitTimeVal).toISOString() : '',
+            status: selectedStatus
+          };
+        }
+        return v;
+      });
+
+      saveVisitors(visitors);
+
+      // Show green success alert banner
+      const successAlert = document.getElementById('entry-success-alert');
+      successAlert.classList.remove('hidden');
+
+      setTimeout(() => {
+        successAlert.classList.add('hidden');
+      }, 4000);
+    }
+
+    // --- PAGE 6: VISITOR LOG ---
+    function renderVisitorLogTable() {
+      const visitors = getVisitors();
+      const search = document.getElementById('log-search').value.toLowerCase();
+      const statusFilter = document.getElementById('log-status-filter').value;
+      const tbody = document.getElementById('visitor-log-table-body');
+      tbody.innerHTML = '';
+
+      const filtered = visitors.filter(v => {
+        const matchesSearch = v.name.toLowerCase().includes(search) ||
+                              v.flat.toLowerCase().includes(search) ||
+                              v.id.toLowerCase().includes(search);
+        const matchesStatus = statusFilter === 'ALL' || v.status === statusFilter;
+        return matchesSearch && matchesStatus;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-500">No gate log entries found matching criteria.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(v => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-700/50 transition';
+        const badgeClass = v.status === 'Inside' ? 'badge-inside' : 'badge-completed';
+        const entryFormatted = v.entryTime ? formatDateDisplay(v.entryTime) : 'N/A';
+        const exitFormatted = v.exitTime ? formatDateDisplay(v.exitTime) : '-- Still Inside --';
+
+        let actionBtn = '';
+        if (v.status === 'Inside') {
+          actionBtn = `
+            <button onclick="markExitNow('${v.id}')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow flex items-center gap-1 mx-auto">
+              <i class="fa-solid fa-right-from-bracket"></i> Mark Exit Now
+            </button>
+          `;
+        } else {
+          actionBtn = `<span class="text-xs text-slate-500 italic"><i class="fa-solid fa-check text-slate-400 mr-1"></i> Log Closed</span>`;
+        }
+
+        tr.innerHTML = `
+          <td class="p-4 font-mono font-bold text-brand-gold">${v.id}</td>
+          <td class="p-4">
+            <span class="block font-semibold text-white">${escapeHtml(v.name)}</span>
+            <span class="text-xs text-slate-400">${escapeHtml(v.phone)}</span>
+          </td>
+          <td class="p-4"><span class="bg-slate-900 border border-slate-700 px-2.5 py-1 rounded text-xs font-bold text-slate-200">${escapeHtml(v.flat)}</span></td>
+          <td class="p-4 text-xs font-mono text-slate-300">${entryFormatted}</td>
+          <td class="p-4 text-xs font-mono ${v.exitTime ? 'text-slate-300' : 'text-emerald-400 font-bold'}">${exitFormatted}</td>
+          <td class="p-4">
+            <span class="text-xs px-2.5 py-1 rounded-full font-bold ${badgeClass}">${v.status}</span>
+          </td>
+          <td class="p-4 text-center">${actionBtn}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function markExitNow(id) {
+      let visitors = getVisitors();
+      visitors = visitors.map(v => {
+        if (v.id === id) {
+          return {
+            ...v,
+            status: 'Completed',
+            exitTime: new Date().toISOString()
+          };
+        }
+        return v;
+      });
+      saveVisitors(visitors);
+      renderVisitorLogTable();
+    }
+
+    function clearAllLogs() {
+      if (confirm("Reset visitor database back to default sample state?")) {
+        localStorage.removeItem(STORAGE_KEY_VISITORS);
+        getVisitors();
+        renderVisitorLogTable();
+      }
+    }
+
+    // --- UTILITIES ---
+    function formatDateDisplay(isoString) {
+      try {
+        const d = new Date(isoString);
+        return d.toLocaleString('en-IN', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        });
+      } catch (e) {
+        return isoString;
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>"']/g, function(m) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;'
+        }[m];
+      });
+    }
+
+    // --- INITIALIZATION ---
+    window.onload = function() {
+      // Seed data if first run
+      getVisitors();
+      getResidents();
+
+      // Start live clock
+      updateLiveClock();
+      setInterval(updateLiveClock, 1000);
+
+      // Default tab
+      switchTab('home');
+    };
+  </script>
+</body>
+</html>
